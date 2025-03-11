@@ -17,5 +17,4 @@ APScheduler==3.10.4
 python-dotenv==1.0.0
 requests==2.31.0
 
-# 开发工具
 django-debug-toolbar==4.2.0 
