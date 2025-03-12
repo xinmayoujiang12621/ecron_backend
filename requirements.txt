@@ -4,17 +4,11 @@ djangorestframework==3.14.0
 django-cors-headers==4.3.1
 
 # MySQL客户端
-mysqlclient==2.2.1
+pymysql==1.1.0
 
 # WSGI服务器
 gunicorn==21.2.0
 
-# 任务调度
-django-apscheduler==0.6.2
-APScheduler==3.10.4
-
 # 工具包
 python-dotenv==1.0.0
 requests==2.31.0
-
-django-debug-toolbar==4.2.0 
