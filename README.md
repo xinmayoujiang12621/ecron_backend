@@ -11,5 +11,5 @@
 打包镜像
 docker build -t ecron_backend:1.0 .
 运行镜像
-docker run -d -p 20130:20130 --name ecron_backend ecron_backend:1.0
+docker run -d -p 20130:20130 --name ecron_backend --network host ecron_backend:1.0
 ```

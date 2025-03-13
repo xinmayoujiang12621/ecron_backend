@@ -14,7 +14,8 @@ class Task(models.Model):
     status = models.CharField(max_length=20, choices=[
         ('active', '活跃'),
         ('paused', '暂停'),
-        ('deleted', '已删除')
+        ('deleted', '已删除'),
+        ('draft', '草稿')
     ], default='active', verbose_name='状态')
     node = models.ForeignKey(
         'Node',
