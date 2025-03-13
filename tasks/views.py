@@ -127,7 +127,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         try:
             # 停止任务
             response = requests.post(
-                f"http://{task.node.host}:5001/tasks/{task.id}/stop",
+                f"http://{task.node.host}:{task.node.port}/tasks/{task.id}/stop",
                 timeout=10,
                 headers={'Content-Type': 'application/json; charset=utf-8'}
             )
@@ -884,4 +884,4 @@ class NodeViewSet(viewsets.ModelViewSet):
             logger.debug(f"执行节点心跳更新: name={name}, host={host}, port={port}")
 
         serializer = self.get_serializer(node)
-        return Response(serializer.data) 
+        return Response(serializer.data)
