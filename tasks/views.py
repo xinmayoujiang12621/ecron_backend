@@ -796,6 +796,55 @@ class NodeViewSet(viewsets.ModelViewSet):
     queryset = Node.objects.all()
     serializer_class = NodeSerializer
 
+    @action(detail=True, methods=['get'])
+    def check_health(self, request, pk=None):
+        """
+        检查执行节点的健康状态
+        通过请求执行节点的/health接口，探测节点是否存活
+        """
+        node = self.get_object()
+
+        try:
+            # 设置较短的超时时间，避免长时间等待
+            url = f"http://{node.host}:{node.port}/health"
+            logger.info(f"正在检查节点健康状态: {node.name}, URL: {url}")
+
+            response = requests.get(url, timeout=5)
+
+            if response.status_code == 200:
+                # 更新节点状态
+                node.status = 'active'
+                node.last_heartbeat = timezone.now()
+                node.save()
+
+                # 返回执行节点的健康信息
+                health_data = response.json()
+                return Response({
+                    'node': self.get_serializer(node).data,
+                    'health': health_data,
+                    'message': '节点健康检查成功'
+                })
+            else:
+                logger.warning(f"节点健康检查失败: {node.name}, 状态码: {response.status_code}")
+                return Response({
+                    'node': self.get_serializer(node).data,
+                    'error': f'节点返回非200状态码: {response.status_code}',
+                    'message': '节点健康检查失败'
+                }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        except requests.RequestException as e:
+            logger.error(f"节点健康检查异常: {node.name}, 错误: {str(e)}")
+
+            # 更新节点状态为不活跃
+            node.status = 'inactive'
+            node.save()
+
+            return Response({
+                'node': self.get_serializer(node).data,
+                'error': str(e),
+                'message': '节点健康检查失败，无法连接到节点'
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
     @action(detail=False, methods=['post'])
     def heartbeat(self, request):
         name = request.data.get('name')
